@@ -1,14 +1,12 @@
 {
   "name": "tst-defaults",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Get default values by Typescript type reflection",
   "main": "dist/index.js",
   "repository": "github.com/ciricc/tst-defaults",
   "author": "ciricc",
   "license": "MIT",
   "dependencies": {
-    "@netleaf/extensions-dependency-injection-typed": "^0.1.2",
-    "@types/node": "^17.0.41",
     "tst-reflect": "^0.7.4"
   },
   "devDependencies": {
