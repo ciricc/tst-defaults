@@ -57,7 +57,6 @@ const parsedJson = new JSONSchema(JSON.parse('{"level": {"n2": 1}}'));
 console.log(parsedJson.n + 1) // ok
 console.log(parsedJson.level.n2 + 1) // ok, result is 2
 console.log(parsedJson.level.bool) // undefined
-
 ```
 
 Not so bad, but still not good. And we have much code again.
@@ -78,14 +77,13 @@ type JSONSchema = {
     b: boolean
 }
 
-const parsedJson = mergeDefaults(getType<JSONSchema>(), JSON.parse('{"level":{"bool":true}}')) as JSONSchema;
+const parsedJson = mergeDefaults(JSON.parse('{"level":{"bool":true}}'), getType<JSONSchema>()) as JSONSchema;
 
 console.log(parsedJson.b === false) // ok
 console.log(parsedJson.list.map(el => el + 1)) // ok
 console.log(parsedJson.level.n2 + 1 === 1) // ok
 console.log(parsedJson.level.bool == true) // ok
 console.log(parsedJson.n + 1) // ok
-
 ```
 
 Simple and fast.
@@ -139,12 +137,12 @@ import {
     mergeDefaults as mergeDefaultsReflected,
     useDefault as useDefaultReflected,
     getDefaultValue as getDefaultValueReflected,
-} from "./dist";
+} from "tst-defaults";
 
 import { getType } from "tst-reflect";
 
-export function mergeDefaults <T>(v: T): T { return mergeDefaultsReflected(getType<T>(), v); }
-export function useDefault <T>(v: T) { return useDefaultReflected(getType<T>(), v); }
+export function mergeDefaults <T>(v: T): T { return mergeDefaultsReflected(v, getType<T>()); }
+export function useDefault <T>(v: T) { return useDefaultReflected(v, getType<T>()); }
 export function getDefaultValue <T>() { return getDefaultValueReflected(getType<T>()); }
 ```
 
@@ -159,26 +157,28 @@ Some api documentation
 
 ### useDefault
 
+Saves type in storage for next time resolving.
+
 ```ts
-import { useDefault, mergeDefaults } from "tst-defaults";
-import { getType } from "tst-reflect";
+import { useDefault, mergeDefaults } from 'tst-defaults';
+import { getType } from 'tst-reflect';
 
 type Duration = {
-    seconds: number
+  seconds: number;
 };
 
 type Schema = {
-    expires: Duration
-    options: Object,
-    users: number
+  expires: Duration;
+  options: Object;
+  users: number;
 };
 
-useDefault(getType<Duration>(), {seconds: -1} as Duration);
-const config = mergeDefaults(getType<Schema>(), JSON.parse('{}')) as Schema;
+useDefault({ seconds: -1 } as Duration, getType<Duration>());
+const config = mergeDefaults(JSON.parse('{}'), getType<Schema>()) as Schema;
 
-console.log(config.expires) // { seconds: -1}
-console.log(config.users) // 0
-console.log(config.options) // {}
+console.log(config.expires); // { seconds: -1}
+console.log(config.users); // 0
+console.log(config.options); // {}
 ```
 
 ### mergeDefaults
@@ -195,7 +195,7 @@ type Schema = {
     n: number
 };
 
-const config = mergeDefaults(getType<Schema>(), jsonErrorIgnored()) as Schema;
+const config = mergeDefaults(jsonErrorIgnored(), getType<Schema>()) as Schema;
 console.log(config.n) // 0, config is created as object
 ```
 
@@ -208,6 +208,7 @@ import { getDefaultValue } from "tst-defaults";
 import { getType } from "tst-reflect";
 
 console.log(getDefaultValue(getType<string>())) // ""
+
 enum Person {
     UNKNOWN = 0,
     PRIVATE = 1,
@@ -221,5 +222,4 @@ console.log(getDefaultValue(getType<number>())) // 0
 console.log(getDefaultValue(getType<Array<number[]>>())) // []
 console.log(getDefaultValue(getType<Function>())) // null
 console.log(getDefaultValue(getType<Person>()) == Person.UNKNOWN) // true
-
 ```
