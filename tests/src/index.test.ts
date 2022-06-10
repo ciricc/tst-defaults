@@ -1,4 +1,4 @@
-import { getDefaultValue, mergeDefaults, useDefault } from "./";
+import { getDefaultValue, mergeDefaults, useDefault } from "../../dist/";
 import { getType } from "tst-reflect"
 
 type PluginD = {
@@ -30,9 +30,9 @@ type Settings = {
 const returnIgnoredJsonError = ():any => {}
 
 test('json schema defaults', () => {
-    useDefault(getType<Duration>(), {
+    useDefault({
         seconds: -1,
-    } as Duration);
+    } as Duration, getType<Duration>());
 
     const jsonString = `{
         "setup_users": 1024,
@@ -41,7 +41,7 @@ test('json schema defaults', () => {
         }
     }`;
 
-    const config = mergeDefaults(getType<Settings>(), JSON.parse(jsonString)) as Settings;
+    const config = mergeDefaults(JSON.parse(jsonString), getType<Settings>()) as Settings;
     expect(config).toEqual({
         settings: {
             plugins: [],
@@ -61,18 +61,19 @@ test("default object and array is not referrence", () => {
         seconds: -1,
     } as Duration;
 
-    useDefault(getType<Duration>(), d1 as Duration);
-
-    const d = getDefaultValue(getType<Duration>())
+    useDefault(d1 as Duration, getType<Duration>());
+    
+    const d = getDefaultValue(getType<Duration>());
+    
     expect(d).not.toBe(d1);
     expect(d).toEqual(d1);
 })
 
 test("create if undefined value", () => {
-    expect(mergeDefaults(getType<number>(), returnIgnoredJsonError())).toBe(0)
-    expect(mergeDefaults(getType<Object>(), returnIgnoredJsonError())).toEqual({})
-    expect(mergeDefaults(getType<Array<number>>(), returnIgnoredJsonError())).toEqual([])
-    expect(mergeDefaults(getType<[number, boolean]>(), returnIgnoredJsonError())).toEqual({"0": 0, "1": false})
+    expect(mergeDefaults(returnIgnoredJsonError(), getType<number>())).toBe(0)
+    expect(mergeDefaults(returnIgnoredJsonError(), getType<Object>())).toEqual({})
+    expect(mergeDefaults(returnIgnoredJsonError(), getType<Array<number>>())).toEqual([])
+    expect(mergeDefaults(returnIgnoredJsonError(), getType<[number, boolean]>())).toEqual({"0": 0, "1": false})
 })
 
 test("default values", () => {

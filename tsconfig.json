@@ -1,37 +1,33 @@
 {
-  "compilerOptions": {
-    "module": "commonjs",
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "target": "es6",
-    "noImplicitAny": false,
-    "moduleResolution": "node",
-    "sourceMap": true,
-    "outDir": "dist",
-    "baseUrl": ".",
-    "strict": true,
-    "paths": {
-      "*": [
-        "node_modules/*",
-        "src/types/*"
-      ]
+    "compilerOptions": {
+        "target": "ES2017",
+        "module": "CommonJS",
+        "moduleResolution": "node",
+        "strict": true,
+        "noImplicitAny": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "declaration": true,
+        "sourceMap": true,
+        "allowJs": true,
+        "forceConsistentCasingInFileNames": true,
+        "noFallthroughCasesInSwitch": true,
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "baseUrl": ".",
+        "outDir": "./dist",
+        "stripInternal": true,
+        "experimentalDecorators": true,
+        "plugins": [
+            {
+                "transform": "tst-reflect-transformer"
+            }
+        ]
     },
-    "plugins": [
-      {
-        "transform": "tst-reflect-transformer"
-      }
+    "include": [
+        "src/**/*.ts"
     ],
-    "declaration": true
-  },
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "src/*.test.ts"
-  ],
-  "ts-node": {
-    "compiler": "ttypescript"
-  }
+    "ts-node": {
+        "compiler": "ttypescript"
+    }
 }

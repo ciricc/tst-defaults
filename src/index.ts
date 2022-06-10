@@ -1,14 +1,15 @@
-import { Type } from "tst-reflect"
+import { getType, Type } from "tst-reflect"
 
-const usingTypes:Map<any, any> = new Map();
+const usingTypes: Map<any, any> = new Map();
 
-/**
+/*
  * Saves default value for specified type
  * If this type already saved, it will rewrite with new value
  * @param defaultValue Default value for the type <T>
  */
-export function useDefault(t: Type, defaultValue:any){
-    let d = defaultValue;
+export function useDefault<T>(defaultValue: T, type?: Type): void {
+    const t = type ? type : getType<T>();
+    let d = defaultValue as any;
     if (Array.isArray(d)) {
         d = [...d];
     } else if (typeof d == "object") {
@@ -23,23 +24,26 @@ export function useDefault(t: Type, defaultValue:any){
  * @param value Current value
  * @returns New rewritten value with default value (or null if not found expected type)
  */
-export function mergeDefaults<T>(t: Type, value:T):T {
-    if (value === undefined) {
-        value = getDefaultValue(t)
+export function mergeDefaults<T>(value: T, type?: Type): T {
+
+    const t = type instanceof Type ? type : getType<T>();
+ 
+    let v = value as any;
+    if (v === undefined) {
+        v = getDefaultValue(t);
     }
 
     const props = t.getProperties()
     for (const prop of props) {
         if (!prop.optional) {
-            if (value[prop.name] === undefined || prop.type.isObjectLike()) {
-                value[prop.name] = mergeDefaults(prop.type, value[prop.name]);
+            if (v[prop.name] === undefined || prop.type.isObjectLike()) {
+                v[prop.name] = mergeDefaults(v[prop.name], prop.type);
             }
         }
     }
 
-    return value
+    return v
 }
-
 
 /**
  * Returns default value for specified type <T>
@@ -51,19 +55,20 @@ export function mergeDefaults<T>(t: Type, value:T):T {
  * object - {}
  * if type not expected - null
  */
-export function getDefaultValue(t:Type):any {
-    
-    if (usingTypes.has(t)) {
-        return usingTypes.get(t);
-    } else if (t.isArray() || t.isTuple()) {
+export function getDefaultValue<T>(t?: Type): any {
+    const type = t ? t : getType<T>();
+
+    if (usingTypes.has(type)) {
+        return usingTypes.get(type);
+    } else if (type.isArray() || type.isTuple()) {
         return [];
-    } else if (t.isBoolean()) {
+    } else if (type.isBoolean()) {
         return false;
-    } else if (t.isEnum() || t.isNumber()) {
+    } else if (type.isEnum() || type.isNumber()) {
         return 0;
-    } else if (t.isObjectLike()) {
+    } else if (type.isObjectLike()) {
         return {}
-    } else if (t.isString()) {
+    } else if (type.isString()) {
         return "";
     }
 
