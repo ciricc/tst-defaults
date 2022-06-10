@@ -1,0 +1,28 @@
+{
+  "name": "tst-defaults",
+  "version": "1.0.0",
+  "description": "Get default values by Typescript type reflection",
+  "main": "dist/index.js",
+  "repository": "github.com/ciricc/tst-defaults",
+  "author": "ciricc",
+  "license": "MIT",
+  "dependencies": {
+    "@types/node": "^17.0.41",
+    "tst-reflect": "^0.7.4"
+  },
+  "devDependencies": {
+    "@types/jest": "^28.1.1",
+    "jest": "^28.1.1",
+    "ts-jest": "^28.0.4",
+    "ts-node": "^10.8.1",
+    "tst-reflect-transformer": "^0.9.9",
+    "ttypescript": "^1.5.13",
+    "typescript": "^4.7.3"
+  },
+  "scripts": {
+    "build": "ttsc",
+    "dev": "ts-node ./src/index.ts",
+    "dev-i": "ts-node ./index.ts",
+    "test": "jest src"
+  }
+}
