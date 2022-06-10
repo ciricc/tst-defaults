@@ -1,9 +1,13 @@
 {
   "name": "tst-defaults",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Get default values by Typescript type reflection",
   "main": "dist/index.js",
-  "repository": "github.com/ciricc/tst-defaults",
+  "repository": {
+		"type": "git",
+		"url": "git+https://github.com/ciricc/tst-defaults.git"
+	},
+  "keywords": ["reflection", "defaults", "typescript", "json", "schema", "gettypevalue", "types"],
   "author": "ciricc",
   "license": "MIT",
   "dependencies": {
