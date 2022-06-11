@@ -2,47 +2,83 @@ import { getType, Type } from "tst-reflect"
 
 const usingTypes: Map<any, any> = new Map();
 
-/*
+/**
  * Saves default value for specified type
- * If this type already saved, it will rewrite with new value
+ * If this type already saved, it will be rewritten with new value
  * @param defaultValue Default value for the type <T>
+ * @param type Type which need to save
  */
 export function useDefault<T>(defaultValue: T, type?: Type): void {
-    const t = type ? type : getType<T>();
+    let t = type ? type : getType<T>();
+    t = resolveType(t);
+
     let d = defaultValue as any;
     if (Array.isArray(d)) {
         d = [...d];
     } else if (typeof d == "object") {
         d = Object.assign({}, d);
     }
+
     usingTypes.set(t, d);
 }
 
 /**
- * Mergin default values into object or array with already reflected type value
- * @param t Type of tst-reflect
+ * Merges default values into object or array with already reflected type value
  * @param value Current value
+ * @param type Type of tst-reflect
  * @returns New rewritten value with default value (or null if not found expected type)
  */
-export function mergeDefaults<T>(value: T, type?: Type): T {
+export function mergeDefaults<T>(value: T, type: Type): T {
 
-    const t = type instanceof Type ? type : getType<T>();
- 
+    let t = resolveType(type);
+    
     let v = value as any;
     if (v === undefined) {
         v = getDefaultValue(t);
     }
 
-    const props = t.getProperties()
-    for (const prop of props) {
-        if (!prop.optional) {
-            if (v[prop.name] === undefined || prop.type.isObjectLike()) {
-                v[prop.name] = mergeDefaults(v[prop.name], prop.type);
+    // Resolving arrays too
+    if (t.isArray() && Array.isArray(value) && value.length) {
+        
+        let typeArg = t.getTypeArguments()[0];
+        if (typeArg) {
+            for (let i = 0; i < value.length; i++) {
+                value[i] = mergeDefaults(value[i], typeArg);
+            } 
+        }
+
+    } else {
+
+        const props = t.getProperties();
+        for (const prop of props) {
+            if (!prop.optional) {
+                let propType = resolveType(prop.type);
+                if (v[prop.name] === undefined || propType.isObjectLike() || propType.isArray()) {
+                    v[prop.name] = mergeDefaults(v[prop.name], propType);
+                }
             }
         }
     }
 
     return v
+}
+
+/**
+ * Check if type if bug-like type of ts-reflect
+ * And if it is, gets real type
+ * @param type 
+ * @returns 
+ */
+const resolveType = (type: Type):Type => {
+    if (type instanceof Function) {
+        let t = type() as Type;
+        if (!(t instanceof Type)) {
+            throw new Error("Type is not a reflected Type")
+        }
+        return t;
+    } else {
+        return type;
+    }
 }
 
 /**
@@ -52,23 +88,25 @@ export function mergeDefaults<T>(value: T, type?: Type): T {
  * array, tuple - []
  * string - ""
  * boolean - false
- * object - {}
+ * Object - {}
  * if type not expected - null
+ * @param type Typeof tst-reflect library
  */
-export function getDefaultValue<T>(t?: Type): any {
-    const type = t ? t : getType<T>();
+export function getDefaultValue<T>(type?: Type): any {
+    let t = type ? type : getType<T>();
+    t = resolveType(t);
 
     if (usingTypes.has(type)) {
         return usingTypes.get(type);
-    } else if (type.isArray() || type.isTuple()) {
+    } else if (t.isArray() || t.isTuple()) {
         return [];
-    } else if (type.isBoolean()) {
+    } else if (t.isBoolean()) {
         return false;
-    } else if (type.isEnum() || type.isNumber()) {
+    } else if (t.isEnum() || t.isNumber()) {
         return 0;
-    } else if (type.isObjectLike()) {
+    } else if (t.isObjectLike()) {
         return {}
-    } else if (type.isString()) {
+    } else if (t.isString()) {
         return "";
     }
 

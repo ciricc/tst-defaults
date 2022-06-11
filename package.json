@@ -1,6 +1,6 @@
 {
   "name": "tst-defaults",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "description": "Get default values by Typescript type reflection",
   "main": "dist/index.js",
   "repository": {
@@ -24,6 +24,6 @@
   },
   "scripts": {
     "build": "ttsc",
-    "test": "ttsc -p tests/tsconfig.json && jest tests/dist"
+    "test": "yarn build && ttsc -p tests/tsconfig.json && jest tests/dist"
   }
 }

@@ -25,11 +25,21 @@ type Settings = {
     },
     setup_users: number
     work_type: WorkType
+    users: User[]
 }
+
+type User = {
+    first_name?: string
+    last_name: string
+    friends: User[]
+    rate_expires?: Duration 
+}
+
 
 const returnIgnoredJsonError = ():any => {}
 
 test('json schema defaults', () => {
+
     useDefault({
         seconds: -1,
     } as Duration, getType<Duration>());
@@ -38,7 +48,16 @@ test('json schema defaults', () => {
         "setup_users": 1024,
         "settings": {
             "use_snippets": true
-        }
+        },
+        "users": [{
+            "friends": [{
+                "first_name": "Oleg",
+                "last_name": "Prokofyev",
+                "rate_expires": {
+                    "seconds": 1000
+                }
+            }]
+        }]
     }`;
 
     const config = mergeDefaults(JSON.parse(jsonString), getType<Settings>()) as Settings;
@@ -53,10 +72,23 @@ test('json schema defaults', () => {
         },
         setup_users: 1024,
         work_type: 0,
+        users: [{
+            first_name: undefined,
+            last_name: "",
+            friends: [{
+                first_name: "Oleg",
+                last_name: "Prokofyev",
+                friends: [],
+                rate_expires: {
+                    seconds: 1000
+                }
+            }]
+        }]
     } as Settings);
 })
 
 test("default object and array is not referrence", () => {
+    
     const d1 = {
         seconds: -1,
     } as Duration;
@@ -69,13 +101,6 @@ test("default object and array is not referrence", () => {
     expect(d).toEqual(d1);
 })
 
-test("create if undefined value", () => {
-    expect(mergeDefaults(returnIgnoredJsonError(), getType<number>())).toBe(0)
-    expect(mergeDefaults(returnIgnoredJsonError(), getType<Object>())).toEqual({})
-    expect(mergeDefaults(returnIgnoredJsonError(), getType<Array<number>>())).toEqual([])
-    expect(mergeDefaults(returnIgnoredJsonError(), getType<[number, boolean]>())).toEqual({"0": 0, "1": false})
-})
-
 test("default values", () => {
     expect(getDefaultValue(getType<Array<number>>())).toEqual([]);
     expect(getDefaultValue(getType<Object>())).toEqual({});
@@ -85,4 +110,12 @@ test("default values", () => {
     expect(getDefaultValue(getType<string>())).toBe("");
     expect(getDefaultValue(getType<String>())).toBe(null);
     expect(getDefaultValue(getType<[boolean, number, Object]>())).toEqual({});
+    expect(getDefaultValue(getType<[boolean, number, Object]>())).toEqual({});
+})
+
+test("create if undefined value", () => {
+    expect(mergeDefaults(returnIgnoredJsonError(), getType<number>())).toBe(0)
+    expect(mergeDefaults(returnIgnoredJsonError(), getType<Object>())).toEqual({})
+    expect(mergeDefaults(returnIgnoredJsonError(), getType<Array<number>>())).toEqual([])
+    expect(mergeDefaults(returnIgnoredJsonError(), getType<[number, boolean]>())).toEqual({"0": 0, "1": false})
 })
