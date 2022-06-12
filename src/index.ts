@@ -13,6 +13,7 @@ export function useDefault<T>(defaultValue: T, type?: Type): void {
     t = resolveType(t);
 
     let d = defaultValue as any;
+    
     if (Array.isArray(d)) {
         d = [...d];
     } else if (typeof d == "object") {
@@ -20,6 +21,16 @@ export function useDefault<T>(defaultValue: T, type?: Type): void {
     }
 
     usingTypes.set(t, d);
+}
+
+/**
+ * Deletes default type value from store
+ * @param type Type from tst-reflect library
+ */
+export function deleteDefault<T>(type?: Type):void {
+    let t = type ? type : getType<T>();
+    t = resolveType(t);
+    usingTypes.delete(t);
 }
 
 /**
@@ -97,6 +108,15 @@ export function getDefaultValue<T>(type?: Type): any {
     t = resolveType(t);
 
     if (usingTypes.has(type)) {
+        const defaultValue = usingTypes.get(type);
+        
+        if (Array.isArray(defaultValue)) {
+            return [...defaultValue];
+        } else if (Object.prototype.toString.call(defaultValue) == "[object Object]") {
+            const newLocal = { ...defaultValue };
+            return newLocal;
+        }
+
         return usingTypes.get(type);
     } else if (t.isArray() || t.isTuple()) {
         return [];

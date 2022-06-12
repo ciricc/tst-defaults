@@ -1,4 +1,4 @@
-import { getDefaultValue, mergeDefaults, useDefault } from "../../dist/";
+import { deleteDefault, getDefaultValue, mergeDefaults, useDefault } from "../../dist/";
 import { getType } from "tst-reflect"
 
 type PluginD = {
@@ -118,4 +118,47 @@ test("create if undefined value", () => {
     expect(mergeDefaults(returnIgnoredJsonError(), getType<Object>())).toEqual({})
     expect(mergeDefaults(returnIgnoredJsonError(), getType<Array<number>>())).toEqual([])
     expect(mergeDefaults(returnIgnoredJsonError(), getType<[number, boolean]>())).toEqual({"0": 0, "1": false})
+})
+
+test("resolved saved default value is not reference", () => {
+    useDefault({
+        seconds: -1
+    } as Duration, getType<Duration>());
+    
+    useDefault([0, 0], getType<number[]>());
+
+    const d1 = getDefaultValue(getType<Duration>());
+    const d2 = getDefaultValue(getType<Duration>());
+
+    const d3 = getDefaultValue(getType<number[]>());
+    const d4 = getDefaultValue(getType<number[]>());
+
+    expect(d1).not.toBe(d2);
+    expect(d3).not.toBe(d4);
+
+    deleteDefault(getType<number[]>()) // clear type
+})
+
+test("default type stored deleting correctly", () => {
+    useDefault({ seconds: -1} as Duration, getType<Duration>()); // object
+    expect(getDefaultValue(getType<Duration>())).toEqual({seconds: -1})
+
+    deleteDefault(getType<Duration>())
+    expect(getDefaultValue(getType<Duration>())).toEqual({})
+})
+
+test("different type arguments defaults", () => {
+    useDefault(["a", "b"], getType<string[]>());
+    useDefault([1, 2], getType<number[]>())
+
+    const d1 = getDefaultValue(getType<string[]>())
+    const d2 = getDefaultValue(getType<number[]>())
+    
+    expect(d1).not.toEqual(d2);
+
+    expect(d1).toEqual(["a", "b"])
+    expect(d2).toEqual([1, 2])
+
+    deleteDefault(getType<string[]>())
+    deleteDefault(getType<number[]>())
 })
