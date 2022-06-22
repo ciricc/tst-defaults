@@ -1,0 +1,7 @@
+src
+tests
+jest.config.js
+*.log
+*.lock
+.devcontainer
+.vscode

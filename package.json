@@ -34,5 +34,8 @@
   "scripts": {
     "build": "ttsc",
     "test": "yarn build && ttsc -p tests/tsconfig.json && jest tests/dist"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/ciricc"
   }
 }
