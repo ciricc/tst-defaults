@@ -20,7 +20,6 @@
   "license": "MIT",
   "dependencies": {
     "cd": "^0.3.3",
-    "tst-defaults": "/workspaces/tst-defaults",
     "tst-reflect": "0.7.4"
   },
   "devDependencies": {
