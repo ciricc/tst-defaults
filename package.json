@@ -1,5 +1,5 @@
 {
-  "name": "tst-defaults",
+  "name": "@ciricc/tst-defaults",
   "version": "1.3.0",
   "description": "Get default values by Typescript type reflection",
   "main": "dist/index.js",
@@ -19,7 +19,6 @@
   "author": "ciricc",
   "license": "MIT",
   "dependencies": {
-    "cd": "^0.3.3",
     "tst-reflect": "0.7.4"
   },
   "devDependencies": {
@@ -30,6 +29,9 @@
     "tst-reflect-transformer": "0.9.9",
     "ttypescript": "^1.5.13",
     "typescript": "^4.7.3"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/ciricc"
   },
   "scripts": {
     "build": "ttsc",
