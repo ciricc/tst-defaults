@@ -1,6 +1,6 @@
 # Make your defaults expectable
 
-This project uses `tst-reflect` library for making your schemas expectable. For example, if you are parsing JSON with predefined schema but didn't want to check that some fields is not defined in object and want to just check default values.
+This project uses [tst-reflect](https://github.com/Hookyns/tst-reflect) library for making your schemas expectable. For example, if you are parsing JSON with predefined schema but didn't want to check that some fields is not defined in object and want to just get default values.
 
 ## Simple example
 
@@ -64,7 +64,6 @@ Not so bad, but still not good. And we have much code again.
 ## Solution
 
 ```ts
-import { getType } from "tst-reflect";
 import { mergeDefaults } from "tst-defaults";
 
 type JSONSchema = {
@@ -77,7 +76,7 @@ type JSONSchema = {
     b: boolean
 }
 
-const parsedJson = mergeDefaults(JSON.parse('{"level":{"bool":true}}'), getType<JSONSchema>()) as JSONSchema;
+const parsedJson = mergeDefaults<JSONSchema>(JSON.parse('{"level":{"bool":true}}'));
 
 console.log(parsedJson.b === false) // ok
 console.log(parsedJson.list.map(el => el + 1)) // ok
@@ -95,7 +94,7 @@ yarn add --dev typescript ttypescript tst-reflect-transformer ts-node
 ```
 
 ```shell
-yarn add tst-reflect tst-defaults
+yarn add tst-defaults
 ```
 
 Setup your `tsconfig.json`
@@ -127,41 +126,16 @@ Setup `package.json`
 }
 ```
 
-
-## Make it more easy
-
-I didn't found solution for use generics with installed npm package. So, you may use this simple util to make more easy usage.
-
-```ts
-import { 
-    mergeDefaults as mergeDefaultsReflected,
-    useDefault as useDefaultReflected,
-    getDefaultValue as getDefaultValueReflected,
-} from "tst-defaults";
-
-import { getType } from "tst-reflect";
-
-export function mergeDefaults <T>(v: T): T { return mergeDefaultsReflected(v, getType<T>()); }
-export function useDefault <T>(v: T) { return useDefaultReflected(v, getType<T>()); }
-export function getDefaultValue <T>() { return getDefaultValueReflected(getType<T>()); }
-```
-
-```ts
-import { mergeDefaults } from "./tst-defaults";
-console.log(mergeDefaults<[number, boolean, Object]>(JSON.parse(`[]`)));
-```
-
 ## API
 
-Some api documentation
+Some api documentation.
 
 ### useDefault
 
-Saves type in storage for next time resolving.
+Saves type default value in storage for next time resolving.
 
 ```ts
 import { useDefault, mergeDefaults } from 'tst-defaults';
-import { getType } from 'tst-reflect';
 
 type Duration = {
   seconds: number;
@@ -173,8 +147,8 @@ type Schema = {
   users: number;
 };
 
-useDefault({ seconds: -1 } as Duration, getType<Duration>());
-const config = mergeDefaults(JSON.parse('{}'), getType<Schema>()) as Schema;
+useDefault<Duration>({ seconds: -1 });
+const config = mergeDefaults<Schema>(JSON.parse('{}'));
 
 console.log(config.expires); // { seconds: -1}
 console.log(config.users); // 0
@@ -187,7 +161,6 @@ Merging default values into variable value. If variable is undefined, than it wi
 
 ```ts
 import { mergeDefaults } from "tst-defaults";
-import { getType } from "tst-reflect";
 
 const jsonErrorIgnored = ():any => {}
 
@@ -195,19 +168,18 @@ type Schema = {
     n: number
 };
 
-const config = mergeDefaults(jsonErrorIgnored(), getType<Schema>()) as Schema;
+const config = mergeDefaults<Schema>(jsonErrorIgnored());
 console.log(config.n) // 0, config is created as object
 ```
 
 ### getDefaultValue
 
-Returns default value for type
+Returns default value for type.
 
 ```ts
 import { getDefaultValue } from "tst-defaults";
-import { getType } from "tst-reflect";
 
-console.log(getDefaultValue(getType<string>())) // ""
+console.log(getDefaultValue<string>()) // ""
 
 enum Person {
     UNKNOWN = 0,
@@ -215,11 +187,33 @@ enum Person {
     PUBLIC = 2,
 }
 
-console.log(getDefaultValue(getType<string>())) // ""
-console.log(getDefaultValue(getType<boolean>())) // false
-console.log(getDefaultValue(getType<Object>())) // {}
-console.log(getDefaultValue(getType<number>())) // 0
-console.log(getDefaultValue(getType<Array<number[]>>())) // []
-console.log(getDefaultValue(getType<Function>())) // null
-console.log(getDefaultValue(getType<Person>()) == Person.UNKNOWN) // true
+console.log(getDefaultValue<string>()) // ""
+console.log(getDefaultValue<boolean>()) // false
+console.log(getDefaultValue<Object>()) // {}
+console.log(getDefaultValue<number>()) // 0
+console.log(getDefaultValue<Array<number[]>>()) // []
+console.log(getDefaultValue<Function>()) // null
+console.log(getDefaultValue<Person>() == Person.UNKNOWN) // true
+```
+
+### deleteDefault
+
+Removes type default value from storage.
+
+```ts
+import { deleteDefault, useDefault, getDefaultValue } from "tst-defaults";
+
+type Duration = {
+  seconds: number;
+};
+
+useDefault<Duration>({
+    seconds: -1
+});
+
+console.log(getDefaultValue<Duration>();) // {seconds: -1}
+
+deleteDefault<Duration>();
+console.log(getDefaultValue<Duration>();) // {}
+
 ```

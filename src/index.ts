@@ -7,6 +7,7 @@ const usingTypes: Map<any, any> = new Map();
  * If this type already saved, it will be rewritten with new value
  * @param defaultValue Default value for the type <T>
  * @param type Type which need to save
+ * @reflect
  */
 export function useDefault<T>(defaultValue: T, type?: Type): void {
     let t = type ? type : getType<T>();
@@ -26,6 +27,7 @@ export function useDefault<T>(defaultValue: T, type?: Type): void {
 /**
  * Deletes default type value from store
  * @param type Type from tst-reflect library
+ * @reflect
  */
 export function deleteDefault<T>(type?: Type):void {
     let t = type ? type : getType<T>();
@@ -38,10 +40,10 @@ export function deleteDefault<T>(type?: Type):void {
  * @param value Current value
  * @param type Type of tst-reflect
  * @returns New rewritten value with default value (or null if not found expected type)
+ * @reflect
  */
-export function mergeDefaults<T>(value: T, type: Type): T {
-
-    let t = resolveType(type);
+export function mergeDefaults<T>(value: T, type?: Type): T {
+    let t = type ? resolveType(type) : resolveType(getType<T>());
     
     let v = value as any;
     if (v === undefined) {
@@ -102,13 +104,14 @@ const resolveType = (type: Type):Type => {
  * Object - {}
  * if type not expected - null
  * @param type Typeof tst-reflect library
+ * @reflect
  */
 export function getDefaultValue<T>(type?: Type): any {
     let t = type ? type : getType<T>();
     t = resolveType(t);
-
-    if (usingTypes.has(type)) {
-        const defaultValue = usingTypes.get(type);
+    if (usingTypes.has(t)) {
+        
+        const defaultValue = usingTypes.get(t);
         
         if (Array.isArray(defaultValue)) {
             return [...defaultValue];
@@ -117,7 +120,7 @@ export function getDefaultValue<T>(type?: Type): any {
             return newLocal;
         }
 
-        return usingTypes.get(type);
+        return usingTypes.get(t);
     } else if (t.isArray() || t.isTuple()) {
         return [];
     } else if (t.isBoolean()) {

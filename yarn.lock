@@ -872,6 +872,11 @@ caniuse-lite@^1.0.30001349:
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001352.tgz#cc6f5da3f983979ad1e2cdbae0505dccaa7c6a12"
   integrity sha512-GUgH8w6YergqPQDGWhJGt8GDRnY0L/iJVQcU3eJ46GYf52R8tk0Wxp0PymuFVZboJYXGiCqwozAYZNRjVj6IcA==
 
+cd@^0.3.3:
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/cd/-/cd-0.3.3.tgz#108ecb57bff93b96b9115c54573cfef3008ef94d"
+  integrity sha512-X2y0Ssu48ucdkrNgCdg6k3EZWjWVy/dsEywUUTeZEIW31f3bQfq65Svm+TzU1Hz+qqhdmyCdjGhUvRsSKHl/mw==
+
 chalk@^2.0.0:
   version "2.4.2"
   resolved "https://registry.yarnpkg.com/chalk/-/chalk-2.4.2.tgz#cd42541677a54333cf541a49108c1432b44c9424"
@@ -2194,7 +2199,12 @@ ts-node@^10.8.1:
     v8-compile-cache-lib "^3.0.1"
     yn "3.1.1"
 
-tst-reflect-transformer@^0.9.9:
+tst-defaults@/workspaces/tst-defaults:
+  version "1.2.0"
+  dependencies:
+    tst-reflect "0.7.4"
+
+tst-reflect-transformer@0.9.9:
   version "0.9.9"
   resolved "https://registry.yarnpkg.com/tst-reflect-transformer/-/tst-reflect-transformer-0.9.9.tgz#06c8c87a04c0bf592eafd3d0574fa32047f8de9c"
   integrity sha512-XfRXPByd2mb3DEmyna7FWL6DmEiNcY2MaFeELeyr8+JxenpG/GPLoncc0OjoHglIc/dy2rAio1VQUqrFionksw==
@@ -2202,7 +2212,7 @@ tst-reflect-transformer@^0.9.9:
     tst-reflect "^0.7.0"
     typescript "^4.0.0"
 
-tst-reflect@^0.7.0, tst-reflect@^0.7.4:
+tst-reflect@0.7.4, tst-reflect@^0.7.0:
   version "0.7.4"
   resolved "https://registry.yarnpkg.com/tst-reflect/-/tst-reflect-0.7.4.tgz#5b105a52f63ec8b00bb4d23a7f7dd74b74c36e41"
   integrity sha512-yHlORAaQquvIlWxBJ+qwGUn2XyQWHms71tCj2hRC0Bt23PeIwztmLMLLDDHrzlWrZXd0E3bF9xRA+C2P66Sh8Q==

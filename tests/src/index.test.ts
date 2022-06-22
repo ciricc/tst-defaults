@@ -38,6 +38,18 @@ type User = {
 
 const returnIgnoredJsonError = ():any => {}
 
+test("generics works correctly", () => {
+    expect(getDefaultValue<number>()).toBe(0)
+    expect(mergeDefaults<number>(returnIgnoredJsonError())).toBe(0)
+    expect(mergeDefaults<boolean>(returnIgnoredJsonError())).toBe(false)
+    useDefault<Duration>({
+        seconds: -1
+    })
+    expect(getDefaultValue<Duration>()).toEqual({
+        seconds: -1
+    })
+})
+
 test('json schema defaults', () => {
 
     useDefault({
