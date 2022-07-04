@@ -11,7 +11,6 @@ const usingTypes: Map<any, any> = new Map();
  */
 export function useDefault<T>(defaultValue: T, type?: Type): void {
     let t = type ? type : getType<T>();
-    t = resolveType(t);
 
     let d = defaultValue as any;
     
@@ -31,7 +30,6 @@ export function useDefault<T>(defaultValue: T, type?: Type): void {
  */
 export function deleteDefault<T>(type?: Type):void {
     let t = type ? type : getType<T>();
-    t = resolveType(t);
     usingTypes.delete(t);
 }
 
@@ -43,7 +41,7 @@ export function deleteDefault<T>(type?: Type):void {
  * @reflect
  */
 export function mergeDefaults<T>(value: T, type?: Type): T {
-    let t = type ? resolveType(type) : resolveType(getType<T>());
+    let t = type ? type : getType<T>();
     
     let v = value as any;
     if (v === undefined) {
@@ -65,7 +63,7 @@ export function mergeDefaults<T>(value: T, type?: Type): T {
         const props = t.getProperties();
         for (const prop of props) {
             if (!prop.optional) {
-                let propType = resolveType(prop.type);
+                let propType = prop.type;
                 if (v[prop.name] === undefined || propType.isObjectLike() || propType.isArray()) {
                     v[prop.name] = mergeDefaults(v[prop.name], propType);
                 }
@@ -74,24 +72,6 @@ export function mergeDefaults<T>(value: T, type?: Type): T {
     }
 
     return v
-}
-
-/**
- * Check if type if bug-like type of ts-reflect
- * And if it is, gets real type
- * @param type 
- * @returns 
- */
-const resolveType = (type: Type):Type => {
-    if (type instanceof Function) {
-        let t = type() as Type;
-        if (!(t instanceof Type)) {
-            throw new Error("Type is not a reflected Type")
-        }
-        return t;
-    } else {
-        return type;
-    }
 }
 
 /**
@@ -108,7 +88,6 @@ const resolveType = (type: Type):Type => {
  */
 export function getDefaultValue<T>(type?: Type): any {
     let t = type ? type : getType<T>();
-    t = resolveType(t);
     if (usingTypes.has(t)) {
         
         const defaultValue = usingTypes.get(t);

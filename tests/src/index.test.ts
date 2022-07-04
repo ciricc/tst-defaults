@@ -28,11 +28,17 @@ type Settings = {
     users: User[]
 }
 
+type Feature = {
+    expires: Duration
+    points: Array<Number>
+}
+
 type User = {
     first_name?: string
     last_name: string
     friends: User[]
-    rate_expires?: Duration 
+    rate_expires?: Duration
+    // available_features: Record<string, Feature>
 }
 
 
@@ -93,8 +99,15 @@ test('json schema defaults', () => {
                 friends: [],
                 rate_expires: {
                     seconds: 1000
-                }
-            }]
+                },
+                // available_features: {
+                //     some_feature: {
+                //         expires: {seconds: -1},
+                //         points: [],
+                //     } 
+                // },
+            }],
+            // available_features: {},
         }]
     } as Settings);
 })
@@ -114,6 +127,7 @@ test("default object and array is not referrence", () => {
 })
 
 test("default values", () => {
+    expect(getDefaultValue(getType<Record<string, Feature>>())).toEqual({})
     expect(getDefaultValue(getType<Array<number>>())).toEqual([]);
     expect(getDefaultValue(getType<Object>())).toEqual({});
     expect(getDefaultValue(getType<Function>())).toBe(null);
@@ -126,6 +140,12 @@ test("default values", () => {
 })
 
 test("create if undefined value", () => {
+    // expect(mergeDefaults({"some_feature": undefined}, getType<Record<string, Feature>>())).toEqual({
+    //     "some_feature": {
+    //         expires: {seconds: -1},
+    //         points: []
+    //     } as Feature
+    // })
     expect(mergeDefaults(returnIgnoredJsonError(), getType<number>())).toBe(0)
     expect(mergeDefaults(returnIgnoredJsonError(), getType<Object>())).toEqual({})
     expect(mergeDefaults(returnIgnoredJsonError(), getType<Array<number>>())).toEqual([])
